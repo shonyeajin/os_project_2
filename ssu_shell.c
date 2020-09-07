@@ -108,40 +108,83 @@ int main(int argc, char *argv[]){
 
 				}
 
-		
 
-				if(strstr(line,pipe)!=NULL){
+				//line에 pipe line 포함되어 있으면 따로 처리해줘야 함
 
-						printf("파이프 문자 처리 ㄱㄱ\n");
+				if(strstr(line,pipe)!=NULL){	
+						int numArr[10]={0,};//배열의 모든 요소를 0으로 초기화
+						int num=0;//line에 포함된 pipe의 갯수
 
-				}
+						for(i=0;tokens[i]!=NULL;i++){
+								if(!strcmp(tokens[i],"|")){
+										numArr[num++]=i;
+										
+								}
+						}
+						/*
+
+						i=0;
+						while(numArr[i]!=0){
+								printf("%d번째 토큰이 파이프임\n",numArr[i]);
+								i++;
+						}
+						*/
+
+						
+						for(int j=0;j<num;j++){
+								printf("파이프 작업\n");
+								int des_p[2];
+								if(pipe(des_p)==-1){
+										perror("pipe failed\n");
+										exit(1);
+								}
+
+								if(fork()==0){
+										close(STDOUT_FILENO);
+										dup(des_p[1]);
+										close(des_p[0]);
+										close(des_p[1]);
 
 
-				//fork시키고, exec 시키고 wait시킴
-				pid_t pid;
-				i=0;
+								}
 
-				
-				
-				
-				if((pid=fork())==0){
-						if(execvp(tokens[0],tokens)==-1){
-								printf("exec failed\n");
+
+						}
+						
+
+
+
+				}else{
+
+						//fork시키고, exec 시키고 wait시킴
+						pid_t pid;
+						i=0;
+
+						
+						
+						
+						if((pid=fork())==0){
+								if(execvp(tokens[0],tokens)==-1){
+										printf("exec failed\n");
+
+								}
 
 						}
 
-				}
+						while(wait((int *)0)!=-1);
+						printf("parent: children terminated, my pid:%d\n",getpid());
+						
 
-				while(wait((int *)0)!=-1);
-				printf("parent: children terminated, my pid:%d\n",getpid());
-				
+						
+						//Freeing the allocated memory
+						for(i=0;tokens[i]!=NULL;i++){
+								free(tokens[i]);
+						}
+						free(tokens);
 
-				
-				//Freeing the allocated memory
-				for(i=0;tokens[i]!=NULL;i++){
-						free(tokens[i]);
+
+
 				}
-				free(tokens);
 
 
 

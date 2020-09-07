@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 				if((pid=fork())==0){
 						char *args[]={"hihi",0};
 						//if(execl("/bin/sh","-c","cd",(const char *)0)==-1){
-						if(execlp("cat","cat","commands.txt",(const char *)0)==-1){
+						if(execlp("ls","ls","|","more",(const char *)0)==-1){
 								printf("exec failed\n");
 						}
 
