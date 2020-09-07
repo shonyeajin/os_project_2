@@ -66,7 +66,7 @@ int main(int argc, char *argv[]){
 		char **tokens;
 		int i;
 		FILE* fp;
-		char *pipe="|";
+		char *pipestr="|";
 
 		if(argc==2){//배치식일때 
 				fp=fopen(argv[1],"r");
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]){
 
 				//line에 pipe line 포함되어 있으면 따로 처리해줘야 함
 
-				if(strstr(line,pipe)!=NULL){	
+				if(strstr(line,pipestr)!=NULL){	
 						int numArr[10]={0,};//배열의 모든 요소를 0으로 초기화
 						int num=0;//line에 포함된 pipe의 갯수
 
@@ -131,25 +131,96 @@ int main(int argc, char *argv[]){
 						while(tmp)
 						{
 								sublineptr[i]=tmp;
-								tmp=strtok(NULL," | ");
+								tmp=strtok(NULL,"| ");
 								i++;
 						}
 						i=0;
 
 						//line쪼개는거는 함, 쓸 떼 마지막에  마지막에 \n 붙이는거 잊지말기
-
 						char subline[MAX_INPUT_SIZE/2];	
 						char **subtokens;
-						strcpy(subline,sublineptr[0]);
-						subline[strlen(subline)]='\n';
-						subtokens=tokenize(subline);
 
-					
 
-						for(i=0;subtokens[i]!=NULL;i++){
-								printf("found subtoken %s (remove this debug output later)\n",tokens[i]);
+
+
+						//fork & exec
+						//pipe 갯수만큼 생성함
+						int *intArr[MAX_NUM_TOKENS];
+
+						for(i=0;i<num;i++){
+								int des_p[2];
+								intArr[i]=des_p;
+
+								if(pipe(intArr[i])==-1){
+										perror("pipe failed\n");
+										exit(1);
+								}
+						}
+
+						//fork문 작성
+						if(fork()==0){
+								close(STDOUT_FILENO);
+								dup(intArr[0][1]);
+
+								close(intArr[0][0]);
+								close(intArr[0][1]);
+
+								strcpy(subline,sublineptr[0]);
+								subline[strlen(subline)]='\n';
+								subtokens=tokenize(subline);
+
+								if(execvp(subtokens[0],subtokens)==-1){
+									printf("exec failed\n");
+
+								}
+								perror("execvp of first failed\n");
+								exit(1);
+
+	
+
+
+
 
 						}
+
+
+
+						for(i=0;i<num-1;i++){
+
+
+						}
+
+						if(fork()==0){
+								close(STDIN_FILENO);
+								dup(intArr[0][0]);
+
+								close(intArr[0][1]);
+								close(intArr[0][0]);
+
+								strcpy(subline,sublineptr[1]);
+								subline[strlen(subline)]='\n';
+								subtokens=tokenize(subline);
+
+								if(execvp(subtokens[0],subtokens)==-1){
+									printf("exec failed\n");
+
+								}
+								perror("execvp of second failed\n");
+								exit(1);
+
+	
+
+
+
+
+						}
+
+						close(intArr[0][0]);
+						close(intArr[0][1]);
+						wait(0);
+						wait(0);
+
+
 
 
 
