@@ -115,12 +115,53 @@ int main(int argc, char *argv[]){
 						int numArr[10]={0,};//배열의 모든 요소를 0으로 초기화
 						int num=0;//line에 포함된 pipe의 갯수
 
+						//파이프가 몇개고, 파이프가 line에서 몇번쨰 토큰인지 알아냄
 						for(i=0;tokens[i]!=NULL;i++){
 								if(!strcmp(tokens[i],"|")){
 										numArr[num++]=i;
 										
 								}
 						}
+						//파이프 갯수 +1만큼의 subline으로 쪼개기
+						char *sublineptr[MAX_INPUT_SIZE/2];
+						char *tmp;
+						i=0;
+
+						tmp=strtok(line,"|");
+						while(tmp)
+						{
+								sublineptr[i]=tmp;
+								tmp=strtok(NULL," | ");
+								i++;
+						}
+						i=0;
+
+						//line쪼개는거는 함, 쓸 떼 마지막에  마지막에 \n 붙이는거 잊지말기
+
+						char subline[MAX_INPUT_SIZE/2];	
+						char **subtokens;
+						strcpy(subline,sublineptr[0]);
+						subline[strlen(subline)]='\n';
+						subtokens=tokenize(subline);
+
+					
+
+						for(i=0;subtokens[i]!=NULL;i++){
+								printf("found subtoken %s (remove this debug output later)\n",tokens[i]);
+
+						}
+
+
+						for(i=0;subtokens[i]!=NULL;i++){
+								free(subtokens[i]);
+						}
+
+						free(subtokens);
+
+
+
+
+
 						/*
 
 						i=0;
@@ -128,7 +169,6 @@ int main(int argc, char *argv[]){
 								printf("%d번째 토큰이 파이프임\n",numArr[i]);
 								i++;
 						}
-						*/
 
 						
 						for(int j=0;j<num;j++){
@@ -140,18 +180,26 @@ int main(int argc, char *argv[]){
 								}
 
 								if(fork()==0){
+
+										char subline[MAX_INPUT_SIZE/2];	
+										char **subtokens;
+										strcpy(subline,sublineptr[0]);
+										subline[strlen(subline)]='\n';
+										subtokens=tokenize(subline);
+
+
 										close(STDOUT_FILENO);
 										dup(des_p[1]);
 										close(des_p[0]);
 										close(des_p[1]);
 
 
+
 								}
 
 
 						}
-						
-
+*/
 
 
 				}else{
@@ -175,6 +223,7 @@ int main(int argc, char *argv[]){
 						printf("parent: children terminated, my pid:%d\n",getpid());
 						
 
+				}
 						
 						//Freeing the allocated memory
 						for(i=0;tokens[i]!=NULL;i++){
@@ -183,8 +232,6 @@ int main(int argc, char *argv[]){
 						free(tokens);
 
 
-
-				}
 
 
 
