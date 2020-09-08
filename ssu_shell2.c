@@ -131,7 +131,7 @@ int main(int argc, char *argv[]){
 						while(tmp)
 						{
 								sublineptr[i]=tmp;
-								tmp=strtok(NULL,"| ");
+								tmp=strtok(NULL,"|");
 								i++;
 						}
 						i=0;
@@ -201,6 +201,13 @@ int main(int argc, char *argv[]){
 								subline[strlen(subline)]='\n';
 								subtokens=tokenize(subline);
 
+								printf("subline:%s\n",subline);
+								for(i=0;subtokens[i]!=NULL;i++){
+										printf("subtokens[%d]:%s\n",i,subtokens[i]);
+
+
+								}
+
 								if(execvp(subtokens[0],subtokens)==-1){
 									printf("exec failed\n");
 
@@ -221,10 +228,7 @@ int main(int argc, char *argv[]){
 						wait(0);
 
 
-
-
-
-
+/*
 						//메모리 free
 
 						for(i=0;subtokens[i]!=NULL;i++){
@@ -233,48 +237,14 @@ int main(int argc, char *argv[]){
 
 						free(subtokens);
 
-
-
-
-
-						/*
-
-						i=0;
-						while(numArr[i]!=0){
-								printf("%d번째 토큰이 파이프임\n",numArr[i]);
-								i++;
-						}
-
-						
-						for(int j=0;j<num;j++){
-								printf("파이프 작업\n");
-								int des_p[2];
-								if(pipe(des_p)==-1){
-										perror("pipe failed\n");
-										exit(1);
-								}
-
-								if(fork()==0){
-
-										char subline[MAX_INPUT_SIZE/2];	
-										char **subtokens;
-										strcpy(subline,sublineptr[0]);
-										subline[strlen(subline)]='\n';
-										subtokens=tokenize(subline);
-
-
-										close(STDOUT_FILENO);
-										dup(des_p[1]);
-										close(des_p[0]);
-										close(des_p[1]);
-
-
-
-								}
-
-
-						}
 */
+
+
+
+
+
+
+
 
 
 				}else{
@@ -300,11 +270,16 @@ int main(int argc, char *argv[]){
 
 				}
 						
-						//Freeing the allocated memory
-						for(i=0;tokens[i]!=NULL;i++){
-								free(tokens[i]);
-						}
-						free(tokens);
+
+
+				//Freeing the allocated memory
+				for(i=0;tokens[i]!=NULL;i++){
+						free(tokens[i]);
+				}
+				free(tokens);
+
+
+
 
 
 
