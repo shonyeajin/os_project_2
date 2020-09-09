@@ -66,7 +66,7 @@ int main(int argc, char *argv[]){
 		char **tokens;
 		int i;
 		FILE* fp;
-		char *pipe="|";
+		char *pipestr="|";
 
 		if(argc==2){//배치식일때 
 				fp=fopen(argv[1],"r");
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]){
 
 				//line에 pipe line 포함되어 있으면 따로 처리해줘야 함
 
-				if(strstr(line,pipe)!=NULL){	
+				if(strstr(line,pipestr)!=NULL){	
 						int numArr[10]={0,};//배열의 모든 요소를 0으로 초기화
 						int num=0;//line에 포함된 pipe의 갯수
 
@@ -131,29 +131,164 @@ int main(int argc, char *argv[]){
 						while(tmp)
 						{
 								sublineptr[i]=tmp;
-								tmp=strtok(NULL," | ");
+								printf("sublineptr[%d]:%s\n",i,sublineptr[i]);
+								tmp=strtok(NULL,"|");
 								i++;
 						}
 						i=0;
 
 						//line쪼개는거는 함, 쓸 떼 마지막에  마지막에 \n 붙이는거 잊지말기
-
 						char subline[MAX_INPUT_SIZE/2];	
 						char **subtokens;
-						strcpy(subline,sublineptr[0]);
-						subline[strlen(subline)]='\n';
-						subtokens=tokenize(subline);
 
-					
 
-						for(i=0;subtokens[i]!=NULL;i++){
-								printf("found subtoken %s (remove this debug output later)\n",tokens[i]);
+
+
+						//fork & exec
+						//pipe 갯수만큼 생성함
+						int *intArr[MAX_NUM_TOKENS];
+
+						for(i=0;i<num;i++){
+								int des_p[2];
+								intArr[i]=des_p;
+
+								if(pipe(intArr[i])==-1){
+										perror("pipe failed\n");
+										exit(1);
+								}
+						}
+
+						//fork문 작성
+						//first fork statement
+						if(fork()==0){
+								close(STDOUT_FILENO);
+								dup(intArr[0][1]);
+
+								//close(intArr[0][0]);
+								//close(intArr[0][1]);
+
+								for(i=0;i<num;i++){
+										close(intArr[i][0]);
+										close(intArr[i][1]);
+								}
+
+
+
+								strcpy(subline,sublineptr[0]);
+								subline[strlen(subline)]='\n';
+								subtokens=tokenize(subline);
+
+								if(execvp(subtokens[0],subtokens)==-1){
+									printf("exec failed\n");
+
+								}
+								perror("execvp of first failed\n");
+								exit(1);
+
+	
+
+
+
+
+						}
+						wait(0);
+
+
+
+						//medium fork statement
+						for(i=0;i<num-1;i++){
+								if(fork()==0)
+								{
+
+										char buf[MAX_INPUT_SIZE/2];
+										int buf_size=read(intArr[i][0],buf,sizeof(buf));
+										printf("buf_size: %d\n",buf_size);
+										printf("buf_input:%s\n",buf);
+										write(intArr[i+1][1],buf,buf_size);
+										//close(STDIN_FILENO);
+										//dup(intArr[i][0]);
+
+										//close(STDOUT_FILENO);
+										//dup(intArr[i+1][1]);
+
+										for(int j=0;j<num;j++){
+												close(intArr[j][0]);
+												close(intArr[j][1]);
+										}
+
+
+
+										strcpy(subline,sublineptr[i+1]);
+										subline[strlen(subline)]='\n';
+										subtokens=tokenize(subline);
+
+
+
+										if(execvp(subtokens[0],subtokens)==-1){
+											printf("exec failed\n");
+
+										}
+										perror("execvp of medium failed\n");
+										exit(1);
+
+
+
+								}
+								wait(0);
 
 						}
 
+						//last fork statement
+						if(fork()==0){
+								close(STDIN_FILENO);
+								dup(intArr[num-1][0]);
+
+								//close(intArr[num-1][1]);
+								//close(intArr[num-1][0]);
+								for(i=0;i<num;i++){
+										close(intArr[i][0]);
+										close(intArr[i][1]);
+								}
 
 
 
+								strcpy(subline,sublineptr[num]);
+								subline[strlen(subline)]='\n';
+								subtokens=tokenize(subline);
+
+								printf("subline:%s\n",subline);
+								for(i=0;subtokens[i]!=NULL;i++){
+										printf("subtokens[%d]:%s\n",i,subtokens[i]);
+
+
+								}
+
+								if(execvp(subtokens[0],subtokens)==-1){
+									perror("exec failed\n");
+
+								}
+								perror("execvp of second failed\n");
+								exit(1);
+
+	
+
+
+
+
+						}
+
+						//close(intArr[0][0]);
+						//close(intArr[0][1]);
+						for(i=0;i<num;i++){
+								close(intArr[i][0]);
+								close(intArr[i][1]);
+						}
+
+						wait(0);
+						//while(wait((int *)0)!=-1);
+						printf("parent: all children terminated, my pid:%d\n",getpid());
+
+/*
 						//메모리 free
 
 						for(i=0;subtokens[i]!=NULL;i++){
@@ -162,48 +297,14 @@ int main(int argc, char *argv[]){
 
 						free(subtokens);
 
-
-
-
-
-						/*
-
-						i=0;
-						while(numArr[i]!=0){
-								printf("%d번째 토큰이 파이프임\n",numArr[i]);
-								i++;
-						}
-
-						
-						for(int j=0;j<num;j++){
-								printf("파이프 작업\n");
-								int des_p[2];
-								if(pipe(des_p)==-1){
-										perror("pipe failed\n");
-										exit(1);
-								}
-
-								if(fork()==0){
-
-										char subline[MAX_INPUT_SIZE/2];	
-										char **subtokens;
-										strcpy(subline,sublineptr[0]);
-										subline[strlen(subline)]='\n';
-										subtokens=tokenize(subline);
-
-
-										close(STDOUT_FILENO);
-										dup(des_p[1]);
-										close(des_p[0]);
-										close(des_p[1]);
-
-
-
-								}
-
-
-						}
 */
+
+
+
+
+
+
+
 
 
 				}else{
@@ -229,11 +330,16 @@ int main(int argc, char *argv[]){
 
 				}
 						
-						//Freeing the allocated memory
-						for(i=0;tokens[i]!=NULL;i++){
-								free(tokens[i]);
-						}
-						free(tokens);
+
+
+				//Freeing the allocated memory
+				for(i=0;tokens[i]!=NULL;i++){
+						free(tokens[i]);
+				}
+				free(tokens);
+
+
+
 
 
 
