@@ -122,6 +122,7 @@ int main(int argc, char *argv[]){
 										
 								}
 						}
+						printf("파이프갯수:%d\n",num);
 						//파이프 갯수 +1만큼의 subline으로 쪼개기
 						char *sublineptr[MAX_INPUT_SIZE/2];
 						char *tmp;
@@ -146,7 +147,7 @@ int main(int argc, char *argv[]){
 
 						//fork & exec
 						//pipe 갯수만큼 생성함
-						int *intArr[MAX_NUM_TOKENS];
+	/*					int *intArr[MAX_NUM_TOKENS];
 
 						for(i=0;i<num;i++){
 								int des_p[2];
@@ -157,17 +158,40 @@ int main(int argc, char *argv[]){
 										exit(1);
 								}
 						}
+	*/
+
+
+
+						int intArr[MAX_NUM_TOKENS][2];
+						for(i=0;i<num;i++){
+								if(pipe(intArr[i])==-1){
+										perror("pipe failed\n");
+										exit(1);
+
+								}
+
+						}
+
+
+
+
+
+						printf("파이:%d\n%d\n%d\n%d\n",intArr[0][0],intArr[0][1],intArr[1][0],intArr[1][1]);
 
 						//fork문 작성
 						//first fork statement
 						if(fork()==0){
+								//close(STDOUT_FILENO);
+								//dup2(intArr[0][1],STDOUT_FILENO);
 								close(STDOUT_FILENO);
 								dup(intArr[0][1]);
+								
 
 								//close(intArr[0][0]);
 								//close(intArr[0][1]);
 
-								for(i=0;i<num;i++){
+								close(intArr[0][0]);
+								for(i=1;i<num;i++){
 										close(intArr[i][0]);
 										close(intArr[i][1]);
 								}
@@ -192,7 +216,9 @@ int main(int argc, char *argv[]){
 
 						}
 						wait(0);
+						close(intArr[0][1]);
 
+						printf("첫\n");
 
 
 						//medium fork statement
@@ -200,23 +226,31 @@ int main(int argc, char *argv[]){
 								if(fork()==0)
 								{
 
-										char buf[MAX_INPUT_SIZE/2];
-										int buf_size=read(intArr[i][0],buf,sizeof(buf));
-										printf("buf_size: %d\n",buf_size);
-										printf("buf_input:%s\n",buf);
-										write(intArr[i+1][1],buf,buf_size);
-										//close(STDIN_FILENO);
-										//dup(intArr[i][0]);
+										//dup2(STDIN_FILENO,intArr[i][0]);
+										//close(intArr[i][0]);
 
+
+										//dup2(intArr[i+1][1],STDOUT_FILENO);
 										//close(STDOUT_FILENO);
-										//dup(intArr[i+1][1]);
 
+										close(STDIN_FILENO);
+										dup(intArr[i][0]);
+										//close(intArr[i][0]);
+
+										close(STDOUT_FILENO);
+										dup(intArr[i+1][1]);
+										
+/*
 										for(int j=0;j<num;j++){
-												close(intArr[j][0]);
-												close(intArr[j][1]);
+												if(j==(i+1)){
+														close(intArr[j][0]);
+												}else{
+														//close(intArr[j][0]);
+														//close(intArr[j][1]);
+												}
 										}
 
-
+*/
 
 										strcpy(subline,sublineptr[i+1]);
 										subline[strlen(subline)]='\n';
@@ -235,11 +269,22 @@ int main(int argc, char *argv[]){
 
 								}
 								wait(0);
+								close(intArr[i+1][1]);
+								printf("두번째\n");
+								
 
 						}
 
 						//last fork statement
 						if(fork()==0){
+
+								//char buf[MAX_INPUT_SIZE];
+								//int buf_size=read(intArr[num-1][0],buf,sizeof(buf));
+								//printf("buf_size: %d\n",buf_size);
+								//printf("buf_input:%s\n",buf);
+
+
+								
 								close(STDIN_FILENO);
 								dup(intArr[num-1][0]);
 

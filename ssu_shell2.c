@@ -181,8 +181,11 @@ int main(int argc, char *argv[]){
 						//fork문 작성
 						//first fork statement
 						if(fork()==0){
+								//close(STDOUT_FILENO);
+								//dup2(intArr[0][1],STDOUT_FILENO);
 								close(STDOUT_FILENO);
 								dup(intArr[0][1]);
+								
 
 								//close(intArr[0][0]);
 								//close(intArr[0][1]);
@@ -213,7 +216,9 @@ int main(int argc, char *argv[]){
 
 						}
 						wait(0);
+						close(intArr[0][1]);
 
+						printf("첫\n");
 
 
 						//medium fork statement
@@ -221,33 +226,31 @@ int main(int argc, char *argv[]){
 								if(fork()==0)
 								{
 
-										dup2(intArr[i][0],STDIN_FILENO);
-										close(STDIN_FILENO);
-										close(intArr[i][0]);
+										//dup2(STDIN_FILENO,intArr[i][0]);
+										//close(intArr[i][0]);
 
 
+										//dup2(intArr[i+1][1],STDOUT_FILENO);
+										//close(STDOUT_FILENO);
 
-										dup2(intArr[i+1][1],STDOUT_FILENO);
-										close(STDOUT_FILENO);
-/*
 										close(STDIN_FILENO);
 										dup(intArr[i][0]);
-										close(intArr[i][0]);
+										//close(intArr[i][0]);
 
 										close(STDOUT_FILENO);
 										dup(intArr[i+1][1]);
-*/										
-
+										
+/*
 										for(int j=0;j<num;j++){
 												if(j==(i+1)){
 														close(intArr[j][0]);
 												}else{
-														close(intArr[j][0]);
-														close(intArr[j][1]);
+														//close(intArr[j][0]);
+														//close(intArr[j][1]);
 												}
 										}
 
-
+*/
 
 										strcpy(subline,sublineptr[i+1]);
 										subline[strlen(subline)]='\n';
@@ -266,6 +269,8 @@ int main(int argc, char *argv[]){
 
 								}
 								wait(0);
+								close(intArr[i+1][1]);
+								printf("두번째\n");
 								
 
 						}
