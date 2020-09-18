@@ -15,8 +15,9 @@
 
 typedef struct _ProcInfo{
 	int p_pid[10];
-	char p_stat[1024];
+	char p_state[10];
 	char p_name[50];
+	char p_VSZ[20];
 	//char p_stat[1];
 } ProcInfo;
 
@@ -52,6 +53,15 @@ int main(int argc, char *argv[]){
 								if(isdigit(dirname[0])){
 										//printf("%s\n",dentry->d_name);
 										//해당프로세스의 정보를 얻기위해 이동
+
+	
+										ProcInfo p;
+										*p.p_pid=atoi(dentry->d_name);
+										//p.p_pid=atoi(dentry->d_name);
+										//strcpy(p.p_stat,buf);
+										
+
+
 										chdir(dentry->d_name);
 										if((fp=fopen("./stat","r"))==NULL){
 												printf("fopen error\n");
@@ -63,15 +73,46 @@ int main(int argc, char *argv[]){
 												printf("fread error\n");
 												exit(1);
 										}
+										//stat에서 추출할 정보 추출하는 영역
+
+
+
+										fclose(fp);
+										//-------------------------
+										if((fp=fopen("./status","r"))==NULL){
+												printf("fopen error\n");
+												exit(1);
+										}
+
+										memset(buf,0,sizeof(buf));
+										if(fread(buf,sizeof(buf),1,fp)<0){
+												printf("fread error\n");
+												exit(1);
+										}
+										//status에서 추출할 정보 추출하는 영역
+
+										char *p_state;
+										p_state=strstr(buf,"State");
+										p_state=strtok(p_state," ");
+										p_state=strtok(p_state," ");
+										strcpy(p.p_state,p_state);
+
+										char *p_VSZ;
+										if(p_VSZ=strstr(buf,"VmSize:")){
+												p_VSZ=strtok(p_VSZ," ");
+												p_VSZ=strtok(p_VSZ," ");
+												strcpy(p.p_VSZ,p_VSZ);
+										}else{
+												strcpy(p.p_VSZ,"0");
+										}
+
+									
+
 										fclose(fp);
 										chdir("..");
 										
 										
-										ProcInfo p;
-										*p.p_pid=atoi(dentry->d_name);
-										strcpy(p.p_stat,buf);
-										
-										
+																			
 										ProcInfoArr[ProcInfoIdx++]=p;
 
 
@@ -87,7 +128,7 @@ int main(int argc, char *argv[]){
 		closedir(dirp);
 
 		for(int i=0;i<ProcInfoIdx;i++){
-				printf("%d:\n%s\n",*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_stat);
+				printf("pid:%d, state:%s, VSZ:%s\n",*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_state,ProcInfoArr[i].p_VSZ);
 
 
 		}
