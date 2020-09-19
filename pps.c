@@ -215,7 +215,18 @@ int main(int argc, char *argv[]){
 										while(strstr(buf,p.p_user_num)==NULL){
 												memset(buf,0,sizeof(buf));
 												if(fgets(buf,sizeof(buf),fp)==NULL){
-														printf("못찾음\n");
+														//못찾았으면 적어도 uid만으로라도 sorting해서 user값 넣어주기
+														rewind(fp);
+														fgets(buf,sizeof(buf),fp);
+														while(strstr(buf,p.p_uid)==NULL){
+																memset(buf,0,sizeof(buf));
+																if(fgets(buf,sizeof(buf),fp)==NULL){
+																		
+																	printf("못찾음\n");
+																	break;
+																}
+														}
+
 														break;
 												}
 
