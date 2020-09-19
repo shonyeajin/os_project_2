@@ -18,6 +18,11 @@ typedef struct _ProcInfo{
 	char p_state[10];
 	char p_name[50];
 	char p_VSZ[20];
+	char p_RSS[20];
+	char p_command[200];
+	char p_uid[10];
+	char p_gid[10];
+	char p_user_num[20];
 	//char p_stat[1];
 } ProcInfo;
 
@@ -92,27 +97,106 @@ int main(int argc, char *argv[]){
 										//status에서 추출할 정보 추출하는 영역
 
 										char *p_state;
-										p_state=strstr(buf,"State");
-										p_state=strtok(p_state," ");
-										p_state=strtok(p_state," ");
+										char buf2[1024];
+										strcpy(buf2,buf);
+										p_state=strstr(buf2,"State");
+										p_state=strtok(p_state,"\t");
+										p_state=strtok(NULL," ");
 										strcpy(p.p_state,p_state);
 
 										char *p_VSZ;
-										if(p_VSZ=strstr(buf,"VmSize:")){
+										memset(buf2,0,sizeof(buf2));
+										strcpy(buf2,buf);
+										if((p_VSZ=strstr(buf2,"VmSize"))!=NULL){
 												p_VSZ=strtok(p_VSZ," ");
-												p_VSZ=strtok(p_VSZ," ");
+												p_VSZ=strtok(NULL," ");
 												strcpy(p.p_VSZ,p_VSZ);
 										}else{
 												strcpy(p.p_VSZ,"0");
 										}
 
-									
+										char *p_RSS;
+										memset(buf2,0,sizeof(buf2));
+										strcpy(buf2,buf);
+										if((p_RSS=strstr(buf2,"VmRSS"))!=NULL){
+												p_RSS=strtok(p_RSS," ");
+												p_RSS=strtok(NULL," ");
+												strcpy(p.p_RSS,p_RSS);
+										}else{
+												strcpy(p.p_RSS,"0");
+										}
+										
+										char *p_command;
+										memset(buf2,0,sizeof(buf2));
+										strcpy(buf2,buf);
+										p_command=strstr(buf2,"Name");
+										p_command=strtok(p_command,"\t");
+										p_command=strtok(NULL,"\n");
+										strcpy(p.p_command,p_command);
+
+										char p_user_num[20];
+										char *p_uid;
+										char *p_gid;
+										memset(buf2,0,sizeof(buf2));
+										strcpy(buf2,buf);
+										p_uid=strstr(buf2,"Uid");
+										p_uid=strtok(p_uid,"\t");
+										p_uid=strtok(NULL,"\t");
+										strcpy(p.p_uid,p_uid);
+
+										memset(buf2,0,sizeof(buf2));
+										strcpy(buf2,buf);
+										p_gid=strstr(buf2,"Gid");
+										p_gid=strtok(p_gid,"\t");
+										p_gid=strtok(NULL,"\t");
+										strcpy(p.p_gid,p_gid);
+										
+										strcpy(p_user_num,p.p_uid);
+										strcat(p_user_num,":");
+										strcat(p_user_num,p.p_gid);
+										strcpy(p.p_user_num,p_user_num);
+
+										
+
+
+	
+										fclose(fp);
+										//-------------------------
+										if((fp=fopen("./cmdline","r"))==NULL){
+												printf("fopen error\n");
+												exit(1);
+										}
+
+										memset(buf,0,sizeof(buf));
+										if(fread(buf,sizeof(buf),1,fp)<0){
+												printf("fread error\n");
+												exit(1);
+										}
+										if(strlen(buf)==0){
+												strcpy(buf,"[");
+												strcat(buf,p.p_command);
+												strcat(buf,"]");
+												strcpy(p.p_command,buf);
+										}else{
+												//memset(p.p_command,0,sizeof(p.p_command));
+												strcpy(p.p_command,buf);
+										}
+										
+													
 
 										fclose(fp);
-										chdir("..");
-										
-										
-																			
+										//---------------/etc로 이동
+										chdir("/etc");
+
+
+
+
+
+
+
+
+										chdir("/proc");
+										//마지막에 항상 /proc디렉토리로 이동한 후 끝내야함						
 										ProcInfoArr[ProcInfoIdx++]=p;
 
 
@@ -128,7 +212,7 @@ int main(int argc, char *argv[]){
 		closedir(dirp);
 
 		for(int i=0;i<ProcInfoIdx;i++){
-				printf("pid:%d, state:%s, VSZ:%s\n",*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_state,ProcInfoArr[i].p_VSZ);
+				printf("pid:%d, state:%s, VSZ:%skB, RSS:%skB, COMMAND:%s\n",*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_state,ProcInfoArr[i].p_VSZ,ProcInfoArr[i].p_RSS,ProcInfoArr[i].p_command);
 
 
 		}
