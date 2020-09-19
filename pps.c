@@ -187,6 +187,40 @@ int main(int argc, char *argv[]){
 										fclose(fp);
 										//---------------/etc로 이동
 										chdir("/etc");
+										if((fp=fopen("./passwd","r"))==NULL){
+												printf("fopen error\n");
+												exit(1);
+										}
+
+										memset(buf,0,sizeof(buf));
+	/*									if(fread(buf,sizeof(buf),1,fp)<0){
+												printf("fread error\n");
+												exit(1);
+										}
+
+										char *p_user;
+
+										while((p_user=strstr(buf,p.p_user_num))==NULL){
+												memset(buf,0,sizeof(buf));
+												if(fread(buf,sizeof(buf),1,fp)<0){
+														printf("fread error\n");
+														exit(1);
+												}
+										}
+										p_user=strtok(p_user,":");
+										printf("user: %s\n",p_user);
+*/
+										char *p_user;
+										fgets(buf,sizeof(buf),fp);
+										while(strstr(buf,p.p_user_num)==NULL){
+												memset(buf,0,sizeof(buf));
+												if(fgets(buf,sizeof(buf),fp)==NULL){
+														printf("못찾음\n");
+														break;
+												}
+
+										}
+										printf("user: %s\n",buf);
 
 
 
@@ -195,6 +229,8 @@ int main(int argc, char *argv[]){
 
 
 
+
+										fclose(fp);
 										chdir("/proc");
 										//마지막에 항상 /proc디렉토리로 이동한 후 끝내야함						
 										ProcInfoArr[ProcInfoIdx++]=p;
@@ -212,7 +248,7 @@ int main(int argc, char *argv[]){
 		closedir(dirp);
 
 		for(int i=0;i<ProcInfoIdx;i++){
-				printf("pid:%d, state:%s, VSZ:%skB, RSS:%skB, COMMAND:%s\n",*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_state,ProcInfoArr[i].p_VSZ,ProcInfoArr[i].p_RSS,ProcInfoArr[i].p_command);
+				printf("pid:%d, state:%s, VSZ:%skB, RSS:%skB, COMMAND:%s,user_num:%s\n",*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_state,ProcInfoArr[i].p_VSZ,ProcInfoArr[i].p_RSS,ProcInfoArr[i].p_command,ProcInfoArr[i].p_user_num);
 
 
 		}
