@@ -23,6 +23,8 @@ typedef struct _ProcInfo{
 	char p_uid[10];
 	char p_gid[10];
 	char p_user_num[20];
+	char p_user[20];
+	char p_stime[10];
 	//char p_stat[1];
 } ProcInfo;
 
@@ -231,7 +233,32 @@ int main(int argc, char *argv[]){
 												}
 
 										}
-										printf("user: %s\n",buf);
+										p_user=strtok(buf,":");
+										strcpy(p.p_user,p_user);
+
+
+
+
+
+										//STIME을 구조체에 저장
+										char p_atime[100];
+										char *p_stime;
+
+										strcpy(p_atime,ctime(&fstat.st_atime));
+										p_stime=strtok(p_atime," ");
+										p_stime=strtok(NULL," ");
+										p_stime=strtok(NULL," ");
+										p_stime=strtok(NULL," ");
+
+										strcpy(p_atime,p_stime);
+										p_atime[5]='\0';
+										p_atime[6]='\0';
+										strcpy(p.p_stime,p_atime);
+
+
+
+
+										//printf("%s\n",p.p_stime);
 
 
 
@@ -259,7 +286,7 @@ int main(int argc, char *argv[]){
 		closedir(dirp);
 
 		for(int i=0;i<ProcInfoIdx;i++){
-				printf("pid:%d, state:%s, VSZ:%skB, RSS:%skB, COMMAND:%s,user_num:%s\n",*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_state,ProcInfoArr[i].p_VSZ,ProcInfoArr[i].p_RSS,ProcInfoArr[i].p_command,ProcInfoArr[i].p_user_num);
+				printf("user:%s, pid:%d, state:%s, VSZ:%skB, RSS:%skB, COMMAND:%s, STIME:%s\n",ProcInfoArr[i].p_user,*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_state,ProcInfoArr[i].p_VSZ,ProcInfoArr[i].p_RSS,ProcInfoArr[i].p_command,ProcInfoArr[i].p_stime);
 
 
 		}
