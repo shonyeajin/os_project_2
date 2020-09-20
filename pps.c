@@ -25,7 +25,11 @@ typedef struct _ProcInfo{
 	char p_user_num[20];
 	char p_user[20];
 	char p_stime[10];
-	//char p_stat[1];
+	char p_ujiff[20];
+	char p_sjiff[20];
+	int p_time;
+	int p_time_min;
+	int p_time_sec;
 } ProcInfo;
 
 ProcInfo ProcInfoArr[200];
@@ -82,6 +86,45 @@ int main(int argc, char *argv[]){
 										}
 										//stat에서 추출할 정보 추출하는 영역
 
+										char buf2[1024];
+
+
+										//TIME 얻기 위해
+										char *p_ujiff;
+										strcpy(buf2,buf);
+										p_ujiff=strtok(buf," ");
+										for(int tokIdx=0;tokIdx<13;tokIdx++){
+												p_ujiff=strtok(NULL," ");
+										}
+										strcpy(p.p_ujiff,p_ujiff);
+										p_ujiff=strtok(NULL," ");
+										strcpy(p.p_sjiff,p_ujiff);
+
+										p.p_time=atoi(p.p_ujiff)+atoi(p.p_sjiff);
+										//분초로 나눠서 계산하기
+										int p_min=0;
+										int p_sec=p.p_time;
+										while(p_sec>=6000){
+												p_sec-=6000;
+												p_min++;
+										}
+										p.p_time_min=p_min;
+										p.p_time_sec=p_sec/100;
+
+										//출력할 때 이런식으로 출력하면 됨
+										//printf("TIME=%d:%d\n",p.p_time_min,p.p_time_sec/100);
+
+
+
+
+
+
+
+
+										
+
+	
+
 
 
 										fclose(fp);
@@ -99,7 +142,7 @@ int main(int argc, char *argv[]){
 										//status에서 추출할 정보 추출하는 영역
 
 										char *p_state;
-										char buf2[1024];
+										memset(buf2,0,sizeof(buf2));
 										strcpy(buf2,buf);
 										p_state=strstr(buf2,"State");
 										p_state=strtok(p_state,"\t");
@@ -258,18 +301,46 @@ int main(int argc, char *argv[]){
 
 
 
-										//printf("%s\n",p.p_stime);
+										fclose(fp);
+										chdir("/proc");
 
+										//%CPU 얻기 위해서
+										// ----/proc디렉토리로 이동하여 stat파일 열음
+										if((fp=fopen("./stat","r"))==NULL){
+												printf("fopen error\n");
+												exit(1);
+										}
 
+										memset(buf,0,sizeof(buf));
 
+										//맨 첫줄 읽어오고 토큰화 해서 값 더해서 cpu_total값
+										
+										if(fgets(buf,sizeof(buf),fp)==NULL){
+												printf("fgets error\n");
+												exit(1);
 
+										}
+										char *cputok;
+										int cpu_jiff_sum=0;
+										cputok=strtok(buf," ");
+										for(int i=0;i<4;i++){
+												cputok=strtok(NULL," ");
+												cpu_jiff_sum+=atoi(cputok);
+
+										}
+
+										//소수형으로 정수 한자리 소수 한자리로 출력하는 방법 알아오기
+										//printf("CPU(persent): %lf\n",(double)((p.p_time*100)/cpu_jiff_sum));
 
 
 
 
 
 										fclose(fp);
-										chdir("/proc");
+
+
+
+
 										//마지막에 항상 /proc디렉토리로 이동한 후 끝내야함						
 										ProcInfoArr[ProcInfoIdx++]=p;
 
@@ -286,7 +357,7 @@ int main(int argc, char *argv[]){
 		closedir(dirp);
 
 		for(int i=0;i<ProcInfoIdx;i++){
-				printf("user:%s, pid:%d, state:%s, VSZ:%skB, RSS:%skB, COMMAND:%s, STIME:%s\n",ProcInfoArr[i].p_user,*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_state,ProcInfoArr[i].p_VSZ,ProcInfoArr[i].p_RSS,ProcInfoArr[i].p_command,ProcInfoArr[i].p_stime);
+				printf("user:%s, pid:%d, state:%s, VSZ:%skB, RSS:%skB, COMMAND:%s, STIME:%s, TIME:%d:%d\n",ProcInfoArr[i].p_user,*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_state,ProcInfoArr[i].p_VSZ,ProcInfoArr[i].p_RSS,ProcInfoArr[i].p_command,ProcInfoArr[i].p_stime,ProcInfoArr[i].p_time_min,ProcInfoArr[i].p_time_sec);
 
 
 		}
