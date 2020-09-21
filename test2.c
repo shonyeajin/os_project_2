@@ -5,18 +5,22 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
+#include <sys/wait.h>
 
 
 int main(int argc,char *argv[]){
-		struct stat sb;
-		char term[100]="/proc/1687";
-		if(stat(term,&sb)==-1){
-				perror("stat error\n");
-				return 1;
+
+		//pps를 코드로 실행시키는 방법
+		pid_t pid;
+
+		if((pid=fork())==0){
+
+				if(execl("./pps","pps",(const char *)0)==-1)
+						printf("exec failed\n");
 		}
+		while(wait((int *)0)!=-1);
+		exit(0);
 
-		printf("last access time:%s\n",ctime(&sb.st_atime));
-		return 0;
-
+	
 
 }

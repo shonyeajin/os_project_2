@@ -12,6 +12,7 @@
 #include <dirent.h>
 #include <time.h>
 #include <ctype.h>
+#include <pwd.h>
 
 typedef struct _ProcInfo{
 	int p_pid[10];
@@ -378,12 +379,76 @@ int main(int argc, char *argv[]){
 				}
 		}
 		closedir(dirp);
-
+/*
 		for(int i=0;i<ProcInfoIdx;i++){
 				printf("user:%s, pid:%d, state:%s, VSZ:%skB, RSS:%skB, COMMAND:%s, STIME:%s, TIME:%d:%d, cpu_persent:%1.1lf, mem_persent:%1.1lf\n",ProcInfoArr[i].p_user,*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_state,ProcInfoArr[i].p_VSZ,ProcInfoArr[i].p_RSS,ProcInfoArr[i].p_command,ProcInfoArr[i].p_stime,ProcInfoArr[i].p_time_min,ProcInfoArr[i].p_time_sec,ProcInfoArr[i].p_cpu,ProcInfoArr[i].p_mem);
 
+				}
+*/
 
+
+	
+		if(argc<2){
+				printf("argument fault\n");
+				exit(1);
 		}
+		if(!strcmp(argv[1],"a")){
+		
+				printf("a option\n");
+		}else if(!strcmp(argv[1],"u")){
+		
+				printf("u option\n");
+
+				uid_t user_id;
+				struct passwd *user_pw;
+
+				user_id=getuid();
+				user_pw=getpwuid(user_id);
+				for(int i=0;i<ProcInfoIdx;i++){
+						if(!strcmp(user_pw->pw_name,ProcInfoArr[i].p_user))
+								printf("%s		%d	%1.1lf	%1.1lf	%s	%s	%s	%s	%d:%d	%s  \n",ProcInfoArr[i].p_user,*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_cpu,ProcInfoArr[i].p_mem,ProcInfoArr[i].p_VSZ,ProcInfoArr[i].p_RSS,ProcInfoArr[i].p_state,ProcInfoArr[i].p_stime,ProcInfoArr[i].p_time_min,ProcInfoArr[i].p_time_sec,ProcInfoArr[i].p_command);
+
+
+				}
+
+	
+
+
+
+		}else if(!strcmp(argv[1],"x")){
+	
+				printf("x option\n");
+		}else if(!strcmp(argv[1],"au")|!strcmp(argv[1],"ua")){
+		
+				printf("au option\n");
+		}else if(!strcmp(argv[1],"ax")|!strcmp(argv[1],"xa")){
+		
+				printf("ax option\n");
+		}else if(!strcmp(argv[1],"ux")|!strcmp(argv[1],"xu")){
+		
+				printf("ux option\n");
+		}else if(!strcmp(argv[1],"aux")|!strcmp(argv[1],"axu")|!strcmp(argv[1],"uax")|!strcmp(argv[1],"xau")|!strcmp(argv[1],"uxa")|!strcmp(argv[1],"xua")){
+		
+				printf("aux option\n");
+				printf("USER		PID	%%CPU	%%MEM	VSZ	RSS	STAT	START	TIME	COMMAND\n");
+				for(int i=0;i<ProcInfoIdx;i++){
+				printf("%s		%d	%1.1lf	%1.1lf	%s	%s	%s	%s	%d:%d	%s  \n",ProcInfoArr[i].p_user,*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_cpu,ProcInfoArr[i].p_mem,ProcInfoArr[i].p_VSZ,ProcInfoArr[i].p_RSS,ProcInfoArr[i].p_state,ProcInfoArr[i].p_stime,ProcInfoArr[i].p_time_min,ProcInfoArr[i].p_time_sec,ProcInfoArr[i].p_command);
+
+
+
+				}
+				
+		}else{
+				printf("잘못된 옵션 입력\n");
+		}
+
+
+
+
+	
+
+
+
 
 
 
