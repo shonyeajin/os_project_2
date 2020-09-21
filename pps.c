@@ -30,6 +30,8 @@ typedef struct _ProcInfo{
 	int p_time;
 	int p_time_min;
 	int p_time_sec;
+	double p_cpu;
+	double p_mem;
 } ProcInfo;
 
 ProcInfo ProcInfoArr[200];
@@ -329,17 +331,38 @@ int main(int argc, char *argv[]){
 
 										}
 
-										//소수형으로 정수 한자리 소수 한자리로 출력하는 방법 알아오기
-										//printf("CPU(persent): %lf\n",(double)((p.p_time*100)/cpu_jiff_sum));
-
-
-
-
+										p.p_cpu=((p.p_time*100.0)/cpu_jiff_sum);
+										//출력할 때 아래처럼 출력하면 됨
+										//printf("CPU(persent): %1.1lf\n",((p.p_time*100.0)/cpu_jiff_sum));
 
 										fclose(fp);
 
+										//mem_percentage계산하기 위해
+										//-------------/proc/meminfo에서 총 메모리량 가져옴
+										if((fp=fopen("./meminfo","r"))==NULL){
+												printf("fopen error\n");
+												exit(1);
+										}
+
+										memset(buf,0,sizeof(buf));
+										if(fread(buf,sizeof(buf),1,fp)<0){
+												printf("fread error\n");
+												exit(1);
+										}
+									
+										char *mem_sum;
+
+										mem_sum=strtok(buf," ");
+										mem_sum=strtok(NULL," ");
+
+										p.p_mem=(atoi(p.p_RSS)*100.0)/atoi(mem_sum);
+										//printf("mem: %lf\n",p.p_mem);
 
 
+
+	
+
+										fclose(fp);
 
 										//마지막에 항상 /proc디렉토리로 이동한 후 끝내야함						
 										ProcInfoArr[ProcInfoIdx++]=p;
@@ -357,7 +380,7 @@ int main(int argc, char *argv[]){
 		closedir(dirp);
 
 		for(int i=0;i<ProcInfoIdx;i++){
-				printf("user:%s, pid:%d, state:%s, VSZ:%skB, RSS:%skB, COMMAND:%s, STIME:%s, TIME:%d:%d\n",ProcInfoArr[i].p_user,*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_state,ProcInfoArr[i].p_VSZ,ProcInfoArr[i].p_RSS,ProcInfoArr[i].p_command,ProcInfoArr[i].p_stime,ProcInfoArr[i].p_time_min,ProcInfoArr[i].p_time_sec);
+				printf("user:%s, pid:%d, state:%s, VSZ:%skB, RSS:%skB, COMMAND:%s, STIME:%s, TIME:%d:%d, cpu_persent:%1.1lf, mem_persent:%1.1lf\n",ProcInfoArr[i].p_user,*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_state,ProcInfoArr[i].p_VSZ,ProcInfoArr[i].p_RSS,ProcInfoArr[i].p_command,ProcInfoArr[i].p_stime,ProcInfoArr[i].p_time_min,ProcInfoArr[i].p_time_sec,ProcInfoArr[i].p_cpu,ProcInfoArr[i].p_mem);
 
 
 		}
