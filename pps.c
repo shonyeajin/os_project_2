@@ -395,6 +395,16 @@ int main(int argc, char *argv[]){
 		if(!strcmp(argv[1],"a")){
 		
 				printf("a option\n");
+				printf("PID	STAT	TIME	COMMAND\n");
+				for(int i=0;i<ProcInfoIdx;i++){
+				printf("%d	%s	%d:%d	%s  \n",*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_state,ProcInfoArr[i].p_time_min,ProcInfoArr[i].p_time_sec,ProcInfoArr[i].p_command);
+
+
+
+				}
+	
+
+
 		}else if(!strcmp(argv[1],"u")){
 		
 				printf("u option\n");
@@ -404,10 +414,14 @@ int main(int argc, char *argv[]){
 
 				user_id=getuid();
 				user_pw=getpwuid(user_id);
+
+				printf("USER		PID	%%CPU	%%MEM	VSZ	RSS	STAT	START	TIME	COMMAND\n");
 				for(int i=0;i<ProcInfoIdx;i++){
-						if(!strcmp(user_pw->pw_name,ProcInfoArr[i].p_user))
+						if(!strcmp(user_pw->pw_name,ProcInfoArr[i].p_user)){
+
 								printf("%s		%d	%1.1lf	%1.1lf	%s	%s	%s	%s	%d:%d	%s  \n",ProcInfoArr[i].p_user,*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_cpu,ProcInfoArr[i].p_mem,ProcInfoArr[i].p_VSZ,ProcInfoArr[i].p_RSS,ProcInfoArr[i].p_state,ProcInfoArr[i].p_stime,ProcInfoArr[i].p_time_min,ProcInfoArr[i].p_time_sec,ProcInfoArr[i].p_command);
 
+						}
 
 				}
 
@@ -416,17 +430,82 @@ int main(int argc, char *argv[]){
 
 
 		}else if(!strcmp(argv[1],"x")){
+
 	
 				printf("x option\n");
+				printf("PID	STAT	TIME	COMMAND\n");
+				for(int i=0;i<ProcInfoIdx;i++){
+				printf("%d	%s	%d:%d	%s  \n",*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_state,ProcInfoArr[i].p_time_min,ProcInfoArr[i].p_time_sec,ProcInfoArr[i].p_command);
+
+
+
+				}
+	
+
+
+
 		}else if(!strcmp(argv[1],"au")|!strcmp(argv[1],"ua")){
-		
+
+
 				printf("au option\n");
-		}else if(!strcmp(argv[1],"ax")|!strcmp(argv[1],"xa")){
+				uid_t user_id;
+				struct passwd *user_pw;
+
+				user_id=getuid();
+				user_pw=getpwuid(user_id);
+
+
+				printf("USER		PID	%%CPU	%%MEM	VSZ	RSS	STAT	START	TIME	COMMAND\n");
+				for(int i=0;i<ProcInfoIdx;i++){
+						if(!strcmp(user_pw->pw_name,ProcInfoArr[i].p_user)){
+	
+
+
+								printf("%s		%d	%1.1lf	%1.1lf	%s	%s	%s	%s	%d:%d	%s  \n",ProcInfoArr[i].p_user,*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_cpu,ProcInfoArr[i].p_mem,ProcInfoArr[i].p_VSZ,ProcInfoArr[i].p_RSS,ProcInfoArr[i].p_state,ProcInfoArr[i].p_stime,ProcInfoArr[i].p_time_min,ProcInfoArr[i].p_time_sec,ProcInfoArr[i].p_command);
+
+
+
+					
+						}
+
+				}
+
 		
+		}else if(!strcmp(argv[1],"ax")|!strcmp(argv[1],"xa")){
+				printf("PID	STAT	TIME	COMMAND\n");
+				for(int i=0;i<ProcInfoIdx;i++){
+				printf("%d	%s	%d:%d	%s  \n",*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_state,ProcInfoArr[i].p_time_min,ProcInfoArr[i].p_time_sec,ProcInfoArr[i].p_command);
+
+
+
+				}
+	
+
 				printf("ax option\n");
 		}else if(!strcmp(argv[1],"ux")|!strcmp(argv[1],"xu")){
 		
 				printf("ux option\n");
+
+				uid_t user_id;
+				struct passwd *user_pw;
+
+				user_id=getuid();
+				user_pw=getpwuid(user_id);
+
+				printf("USER		PID	%%CPU	%%MEM	VSZ	RSS	STAT	START	TIME	COMMAND\n");
+				for(int i=0;i<ProcInfoIdx;i++){
+						if(!strcmp(user_pw->pw_name,ProcInfoArr[i].p_user)){
+
+								printf("%s		%d	%1.1lf	%1.1lf	%s	%s	%s	%s	%d:%d	%s  \n",ProcInfoArr[i].p_user,*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_cpu,ProcInfoArr[i].p_mem,ProcInfoArr[i].p_VSZ,ProcInfoArr[i].p_RSS,ProcInfoArr[i].p_state,ProcInfoArr[i].p_stime,ProcInfoArr[i].p_time_min,ProcInfoArr[i].p_time_sec,ProcInfoArr[i].p_command);
+
+						}
+
+				}
+
+	
+
+
+
 		}else if(!strcmp(argv[1],"aux")|!strcmp(argv[1],"axu")|!strcmp(argv[1],"uax")|!strcmp(argv[1],"xau")|!strcmp(argv[1],"uxa")|!strcmp(argv[1],"xua")){
 		
 				printf("aux option\n");

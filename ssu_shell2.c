@@ -202,6 +202,14 @@ int main(int argc, char *argv[]){
 								subline[strlen(subline)]='\n';
 								subtokens=tokenize(subline);
 
+								if(!strcmp(subtokens[0],"pps")){
+										if(execv("pps",subtokens)==-1){
+												printf("execl failed\n");
+										}
+
+								}
+
+
 								if(execvp(subtokens[0],subtokens)==-1){
 									printf("exec failed\n");
 
@@ -256,6 +264,13 @@ int main(int argc, char *argv[]){
 										subline[strlen(subline)]='\n';
 										subtokens=tokenize(subline);
 
+										if(!strcmp(subtokens[0],"pps")){
+												if(execv("pps",subtokens)==-1){
+														printf("execl failed\n");
+												}
+
+										}
+
 
 
 										if(execvp(subtokens[0],subtokens)==-1){
@@ -307,6 +322,16 @@ int main(int argc, char *argv[]){
 
 
 								}
+
+								if(!strcmp(subtokens[0],"pps")){
+										if(execv("pps",subtokens)==-1){
+												printf("execl failed\n");
+										}
+
+								}
+
+
+
 
 								if(execvp(subtokens[0],subtokens)==-1){
 									perror("exec failed\n");
@@ -362,6 +387,13 @@ int main(int argc, char *argv[]){
 						
 						
 						if((pid=fork())==0){
+								//pps에 대한 exec함수 별도 처리-->위에 파이프 구현에도 적용시키기
+								if(!strcmp(tokens[0],"pps")){
+										if(execv("pps",tokens)==-1){
+												printf("execl failed\n");
+										}
+
+								}
 								if(execvp(tokens[0],tokens)==-1){
 										printf("exec failed\n");
 
