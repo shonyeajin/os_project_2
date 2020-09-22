@@ -209,6 +209,14 @@ int main(int argc, char *argv[]){
 
 								}
 
+								if(!strcmp(subtokens[0],"ttop")){
+										if(execv("ttop",subtokens)==-1){
+												printf("execl failed\n");
+										}
+
+								}
+
+
 
 								if(execvp(subtokens[0],subtokens)==-1){
 									printf("exec failed\n");
@@ -271,6 +279,13 @@ int main(int argc, char *argv[]){
 
 										}
 
+										if(!strcmp(subtokens[0],"ttop")){
+												if(execv("ttop",subtokens)==-1){
+														printf("execl failed\n");
+												}
+
+										}
+
 
 
 										if(execvp(subtokens[0],subtokens)==-1){
@@ -325,6 +340,13 @@ int main(int argc, char *argv[]){
 
 								if(!strcmp(subtokens[0],"pps")){
 										if(execv("pps",subtokens)==-1){
+												printf("execl failed\n");
+										}
+
+								}
+
+								if(!strcmp(subtokens[0],"ttop")){
+										if(execv("ttop",subtokens)==-1){
 												printf("execl failed\n");
 										}
 
@@ -394,6 +416,16 @@ int main(int argc, char *argv[]){
 										}
 
 								}
+
+								if(!strcmp(tokens[0],"ttop")){
+										if(execv("ttop",tokens)==-1){
+												printf("execl failed\n");
+										}
+
+								}
+
+
+
 								if(execvp(tokens[0],tokens)==-1){
 										printf("exec failed\n");
 
