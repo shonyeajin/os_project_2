@@ -142,26 +142,6 @@ int main(int argc, char *argv[]){
 						char subline[MAX_INPUT_SIZE/2];	
 						char **subtokens;
 
-
-
-
-						//fork & exec
-						//pipe 갯수만큼 생성함
-	/*					int *intArr[MAX_NUM_TOKENS];
-
-						for(i=0;i<num;i++){
-								int des_p[2];
-								intArr[i]=des_p;
-
-								if(pipe(intArr[i])==-1){
-										perror("pipe failed\n");
-										exit(1);
-								}
-						}
-	*/
-
-
-
 						int intArr[MAX_NUM_TOKENS][2];
 						for(i=0;i<num;i++){
 								if(pipe(intArr[i])==-1){
@@ -173,30 +153,19 @@ int main(int argc, char *argv[]){
 						}
 
 
-
-
-
 						printf("파이:%d\n%d\n%d\n%d\n",intArr[0][0],intArr[0][1],intArr[1][0],intArr[1][1]);
 
 						//fork문 작성
 						//first fork statement
 						if(fork()==0){
-								//close(STDOUT_FILENO);
-								//dup2(intArr[0][1],STDOUT_FILENO);
 								close(STDOUT_FILENO);
 								dup(intArr[0][1]);
 								
-
-								//close(intArr[0][0]);
-								//close(intArr[0][1]);
-
 								close(intArr[0][0]);
 								for(i=1;i<num;i++){
 										close(intArr[i][0]);
 										close(intArr[i][1]);
 								}
-
-
 
 								strcpy(subline,sublineptr[0]);
 								subline[strlen(subline)]='\n';
@@ -219,16 +188,11 @@ int main(int argc, char *argv[]){
 
 
 								if(execvp(subtokens[0],subtokens)==-1){
-									printf("exec failed\n");
+									printf("SSUShell: Incorrect command\n");
 
 								}
 								perror("execvp of first failed\n");
 								exit(1);
-
-	
-
-
-
 
 						}
 						wait(0);
@@ -242,31 +206,12 @@ int main(int argc, char *argv[]){
 								if(fork()==0)
 								{
 
-										//dup2(STDIN_FILENO,intArr[i][0]);
-										//close(intArr[i][0]);
-
-
-										//dup2(intArr[i+1][1],STDOUT_FILENO);
-										//close(STDOUT_FILENO);
-
 										close(STDIN_FILENO);
 										dup(intArr[i][0]);
-										//close(intArr[i][0]);
 
 										close(STDOUT_FILENO);
 										dup(intArr[i+1][1]);
 										
-/*
-										for(int j=0;j<num;j++){
-												if(j==(i+1)){
-														close(intArr[j][0]);
-												}else{
-														//close(intArr[j][0]);
-														//close(intArr[j][1]);
-												}
-										}
-
-*/
 
 										strcpy(subline,sublineptr[i+1]);
 										subline[strlen(subline)]='\n';
@@ -289,7 +234,7 @@ int main(int argc, char *argv[]){
 
 
 										if(execvp(subtokens[0],subtokens)==-1){
-											printf("exec failed\n");
+											printf("SSUShell: Incorrect command\n");
 
 										}
 										perror("execvp of medium failed\n");
@@ -307,25 +252,14 @@ int main(int argc, char *argv[]){
 
 						//last fork statement
 						if(fork()==0){
-
-								//char buf[MAX_INPUT_SIZE];
-								//int buf_size=read(intArr[num-1][0],buf,sizeof(buf));
-								//printf("buf_size: %d\n",buf_size);
-								//printf("buf_input:%s\n",buf);
-
-
 								
 								close(STDIN_FILENO);
 								dup(intArr[num-1][0]);
 
-								//close(intArr[num-1][1]);
-								//close(intArr[num-1][0]);
 								for(i=0;i<num;i++){
 										close(intArr[i][0]);
 										close(intArr[i][1]);
 								}
-
-
 
 								strcpy(subline,sublineptr[num]);
 								subline[strlen(subline)]='\n';
@@ -353,49 +287,24 @@ int main(int argc, char *argv[]){
 								}
 
 
-
-
 								if(execvp(subtokens[0],subtokens)==-1){
-									perror("exec failed\n");
+									perror("SSUShell: Incorrect command\n");
 
 								}
-								perror("execvp of second failed\n");
+
+								perror("last exec failed\n");
 								exit(1);
-
-	
-
-
 
 
 						}
 
-						//close(intArr[0][0]);
-						//close(intArr[0][1]);
 						for(i=0;i<num;i++){
 								close(intArr[i][0]);
 								close(intArr[i][1]);
 						}
 
 						wait(0);
-						//while(wait((int *)0)!=-1);
 						printf("parent: all children terminated, my pid:%d\n",getpid());
-
-/*
-						//메모리 free
-
-						for(i=0;subtokens[i]!=NULL;i++){
-								free(subtokens[i]);
-						}
-
-						free(subtokens);
-
-*/
-
-
-
-
-
-
 
 
 
@@ -406,10 +315,7 @@ int main(int argc, char *argv[]){
 						i=0;
 
 						
-						
-						
 						if((pid=fork())==0){
-								//pps에 대한 exec함수 별도 처리-->위에 파이프 구현에도 적용시키기
 								if(!strcmp(tokens[0],"pps")){
 										if(execv("pps",tokens)==-1){
 												printf("execl failed\n");
@@ -427,7 +333,7 @@ int main(int argc, char *argv[]){
 
 
 								if(execvp(tokens[0],tokens)==-1){
-										printf("exec failed\n");
+										printf("SSUShell: Incorrect command\n");
 
 								}
 
@@ -438,8 +344,6 @@ int main(int argc, char *argv[]){
 						
 
 				}
-						
-
 
 				//Freeing the allocated memory
 				for(i=0;tokens[i]!=NULL;i++){
@@ -447,18 +351,8 @@ int main(int argc, char *argv[]){
 				}
 				free(tokens);
 
-
-
-
-
-
-
-
-
 		}
 }
-
-
 
 
 void exitfunc(int signo){

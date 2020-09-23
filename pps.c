@@ -389,8 +389,19 @@ int main(int argc, char *argv[]){
 
 	
 		if(argc<2){
-				printf("argument fault\n");
-				exit(1);
+				printf("default pps\n");
+				printf("PID	TIME	CMD\n");
+				for(int i=0;i<ProcInfoIdx;i++){
+						if(!strcmp(ProcInfoArr[i].p_command,"bash")||!strcmp(ProcInfoArr[i].p_command,"pps"))
+							printf("%d	%d:%d	%s\n",*ProcInfoArr[i].p_pid,ProcInfoArr[i].p_time_min,ProcInfoArr[i].p_time_sec,ProcInfoArr[i].p_command);
+
+
+				}
+
+				exit(0);
+
+
+
 		}
 		if(!strcmp(argv[1],"a")){
 		
